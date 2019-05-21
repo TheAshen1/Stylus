@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Stylus.Analyzers.Tests": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ENV": "Test",
+        "Key": "Value"
+      }
+    }
+  }
+}

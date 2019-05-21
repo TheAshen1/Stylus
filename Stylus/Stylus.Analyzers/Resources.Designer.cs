@@ -8,9 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Stylus {
+namespace Stylus.Analyzers {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -40,7 +39,7 @@ namespace Stylus {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Stylus.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Stylus.Analyzers.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -85,6 +84,33 @@ namespace Stylus {
         internal static string AnalyzerTitle {
             get {
                 return ResourceManager.GetString("AnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enums should not contain &quot;Enum&quot; in it&apos;s name.
+        /// </summary>
+        internal static string StylusEnumNameAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("StylusEnumNameAnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enum &apos;{0}&apos; contains suffix &apos;{1}&apos; in it&apos;s name.
+        /// </summary>
+        internal static string StylusEnumNameAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("StylusEnumNameAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enum should be renamed.
+        /// </summary>
+        internal static string StylusEnumNameAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("StylusEnumNameAnalyzerTitle", resourceCulture);
             }
         }
     }

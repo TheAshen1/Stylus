@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Stylus
+namespace Stylus.Analyzers
 {
     public static class Util
     {

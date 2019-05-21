@@ -129,4 +129,16 @@
     <value>Class members could be reordered</value>
     <comment>The title of the diagnostic.</comment>
   </data>
+  <data name="StylusEnumNameAnalyzerDescription" xml:space="preserve">
+    <value>Enums should not contain "Enum" in it's name</value>
+    <comment>An optional longer localizable description of the diagnostic.</comment>
+  </data>
+  <data name="StylusEnumNameAnalyzerMessageFormat" xml:space="preserve">
+    <value>Enum '{0}' contains suffix '{1}' in it's name</value>
+    <comment>The format-able message the diagnostic displays.</comment>
+  </data>
+  <data name="StylusEnumNameAnalyzerTitle" xml:space="preserve">
+    <value>Enum should be renamed</value>
+    <comment>The title of the diagnostic.</comment>
+  </data>
 </root>

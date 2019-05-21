@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stylus", "Stylus\Stylus\Stylus.csproj", "{0642E3AE-4842-46E2-A0E0-24886FA7CC28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stylus.Analyzers", "Stylus\Stylus.Analyzers\Stylus.Analyzers.csproj", "{0642E3AE-4842-46E2-A0E0-24886FA7CC28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stylus.Test", "Stylus\Stylus.Test\Stylus.Test.csproj", "{E65AFF2D-DC57-42AD-A296-88E78F6352A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stylus.Analyzers.Test", "Stylus\Stylus.Analyzers.Tests\Stylus.Analyzers.Tests.csproj", "{E65AFF2D-DC57-42AD-A296-88E78F6352A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stylus.Vsix", "Stylus\Stylus.Vsix\Stylus.Vsix.csproj", "{E4CD64D3-E7A0-447B-A635-44B6C3D2D2E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stylus.Analyzers.Vsix", "Stylus\Stylus.Analyzers.Vsix\Stylus.Analyzers.Vsix.csproj", "{E4CD64D3-E7A0-447B-A635-44B6C3D2D2E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
