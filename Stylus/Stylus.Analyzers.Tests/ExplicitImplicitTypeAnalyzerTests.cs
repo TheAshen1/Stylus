@@ -7,7 +7,7 @@ using TestHelper;
 namespace Stylus.Analyzers.Tests
 {
     [TestClass]
-    public class EnumNameAnalyzerTests : DiagnosticVerifier
+    public class ExplicitImplicitTypeAnalyzerTests : DiagnosticVerifier
     {
         [TestMethod]
         public void TestMethod1()
@@ -25,26 +25,31 @@ using System;
 
 namespace AnalyzerTest
 {
-    enum TestEnum
+    static void Main(string[] args)
     {
-        A,
-        B
+        var t = new DateTime();
+        var tim = Now();
+        DateTime tex = Now();
+    }
+    private static DateTime Now()
+    {
+        return DateTime.Now;
     }
 }";
             var expected = new DiagnosticResult
             {
-                Id = StylusManifest.EnumNameAnalyzerId,
-                Message = String.Format("Enum '{0}' contains suffix '{1}' in it's name", "TestEnum", "Enum"),
+                Id = StylusManifest.ExplicitImplicitTypeAnalyzerId,
+                Message = String.Format("{0} type decalaration should be used", "Explicit"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
-                            new DiagnosticResultLocation("Test0.cs", 6, 5)
+                            new DiagnosticResultLocation("Test0.cs", 9, 9)
                         }
             };
 
             VerifyCSharpDiagnostic(test, expected);
         }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new EnumNameAnalyzer();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new ExplicitImplicitTypeAnalyzer();
     }
 }

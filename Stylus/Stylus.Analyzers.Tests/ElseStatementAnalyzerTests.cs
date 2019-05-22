@@ -7,7 +7,7 @@ using TestHelper;
 namespace Stylus.Analyzers.Tests
 {
     [TestClass]
-    public class EnumNameAnalyzerTests : DiagnosticVerifier
+    public class ElseStatementAnalyzerTests : DiagnosticVerifier
     {
         [TestMethod]
         public void TestMethod1()
@@ -25,26 +25,33 @@ using System;
 
 namespace AnalyzerTest
 {
-    enum TestEnum
+    static void Main(string[] args)
     {
-        A,
-        B
+        var a = true;
+        if(a)
+        {
+            Console.WriteLine(""Ok"");
+        }
+        else
+        {
+            Console.WriteLine(""Not Ok"");
+        }
     }
 }";
             var expected = new DiagnosticResult
             {
-                Id = StylusManifest.EnumNameAnalyzerId,
-                Message = String.Format("Enum '{0}' contains suffix '{1}' in it's name", "TestEnum", "Enum"),
+                Id = StylusManifest.ElseStatementAnalyzerId,
+                Message = String.Format("Else statement should be avoided"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
-                            new DiagnosticResultLocation("Test0.cs", 6, 5)
+                            new DiagnosticResultLocation("Test0.cs", 13, 9)
                         }
             };
 
             VerifyCSharpDiagnostic(test, expected);
         }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new EnumNameAnalyzer();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new ElseStatementAnalyzer();
     }
 }

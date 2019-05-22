@@ -7,7 +7,7 @@ using TestHelper;
 namespace Stylus.Analyzers.Tests
 {
     [TestClass]
-    public class EnumNameAnalyzerTests : DiagnosticVerifier
+    public class DoStatementAnalyzerTests : DiagnosticVerifier
     {
         [TestMethod]
         public void TestMethod1()
@@ -25,26 +25,29 @@ using System;
 
 namespace AnalyzerTest
 {
-    enum TestEnum
+    static void Main(string[] args)
     {
-        A,
-        B
+        do
+        {
+            Console.WriteLine(""do"");
+        }
+        while (true);
     }
 }";
             var expected = new DiagnosticResult
             {
-                Id = StylusManifest.EnumNameAnalyzerId,
-                Message = String.Format("Enum '{0}' contains suffix '{1}' in it's name", "TestEnum", "Enum"),
+                Id = StylusManifest.DoStatementAnalyzerId,
+                Message = String.Format("Do statement should be avoided"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
-                            new DiagnosticResultLocation("Test0.cs", 6, 5)
+                            new DiagnosticResultLocation("Test0.cs", 8, 9)
                         }
             };
 
             VerifyCSharpDiagnostic(test, expected);
         }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new EnumNameAnalyzer();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new DoStatementAnalyzer();
     }
 }
