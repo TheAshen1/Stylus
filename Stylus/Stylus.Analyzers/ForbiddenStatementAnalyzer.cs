@@ -21,8 +21,7 @@ namespace Stylus.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzerAction, SyntaxKind.ElseClause);
-            context.RegisterSyntaxNodeAction(AnalyzerAction, SyntaxKind.DoStatement);
+            context.RegisterSyntaxNodeAction(AnalyzerAction, SyntaxKind.ElseClause, SyntaxKind.DoStatement);
         }
 
         private void AnalyzerAction(SyntaxNodeAnalysisContext context)
