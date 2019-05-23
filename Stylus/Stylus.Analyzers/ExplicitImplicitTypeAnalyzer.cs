@@ -11,7 +11,7 @@ namespace Stylus.Analyzers
     public class ExplicitImplicitTypeAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = StylusManifest.ExplicitImplicitTypeAnalyzerId;
-        internal static readonly LocalizableString Title = "Type declaration should be corrected";
+        internal static readonly LocalizableString Title = "Type declaration rule violation";
         internal static readonly LocalizableString MessageFormat = "{0} type decalaration should be used";
         internal const string Category = StylusManifest.Category;
 

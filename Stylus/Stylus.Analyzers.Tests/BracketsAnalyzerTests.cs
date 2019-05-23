@@ -7,12 +7,27 @@ using TestHelper;
 namespace Stylus.Analyzers.Tests
 {
     [TestClass]
-    public class ForbiddenStatementAnalyzerTests : DiagnosticVerifier
+    public class BracketsAnalyzerTests : DiagnosticVerifier
     {
         [TestMethod]
         public void TestMethod1()
         {
-            var test = @"";
+            var test = @"
+using System;
+
+namespace AnalyzerTest
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            if (true)
+            {
+                Console.WriteLine(""Ok"");
+            }
+        }
+    }
+}";
 
             VerifyCSharpDiagnostic(test);
         }
@@ -25,30 +40,23 @@ using System;
 
 namespace AnalyzerTest
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
-            var a = true;
-            if(a)
-            {
-                Console.WriteLine(""Ok"");
-            }
-            else
-            {
-                Console.WriteLine(""Not Ok"");
-            }
+            if (true)
+                Console.WriteLine(""Wrong"");
         }
     }
 }";
             var expected = new DiagnosticResult
             {
-                Id = StylusManifest.ForbiddenStatementAnalyzerId,
-                Message = String.Format("{0} statement should be avoided", "Else"),
+                Id = StylusManifest.BracketsAnalyzerId,
+                Message = String.Format("{0} should {1}", "Braces", "be used"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
-                            new DiagnosticResultLocation("Test0.cs", 15, 13)
+                            new DiagnosticResultLocation("Test0.cs", 10, 13)
                         }
             };
 
@@ -63,22 +71,18 @@ using System;
 
 namespace AnalyzerTest
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
-            do
-            {
-                Console.WriteLine(""do"");
-            }
-            while (true);
+            if (true) { Console.WriteLine(""Wrong""); }
         }
     }
 }";
             var expected = new DiagnosticResult
             {
-                Id = StylusManifest.ForbiddenStatementAnalyzerId,
-                Message = String.Format("{0} statement should be avoided", "Do-While"),
+                Id = StylusManifest.BracketsAnalyzerId,
+                Message = String.Format("{0} should {1}", "Braces", "be placed on their own lines"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -89,6 +93,7 @@ namespace AnalyzerTest
             VerifyCSharpDiagnostic(test, expected);
         }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new ForbiddenStatementAnalyzer();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new BracketsAnalyzer();
     }
+
 }

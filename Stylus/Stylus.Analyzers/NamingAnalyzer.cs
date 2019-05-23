@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,8 +11,8 @@ namespace Stylus.Analyzers
     public class NamingAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = StylusManifest.NamingAnalyzerId;
-        internal static readonly LocalizableString Title = "Naming must follow codestyle";
-        internal static readonly LocalizableString MessageFormat = "{0} must {1}";
+        internal static readonly LocalizableString Title = "Naming rule violation";
+        internal static readonly LocalizableString MessageFormat = "Naming rule violation: {0}";
         internal const string Category = StylusManifest.Category;
 
         internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
@@ -26,30 +23,56 @@ namespace Stylus.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(TypeAndFunctionNameCheck, SyntaxKind.MethodDeclaration, SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.PropertyDeclaration, SyntaxKind.DelegateDeclaration);
-            context.RegisterSyntaxNodeAction(LocalVariableNameCheck, SyntaxKind.LocalDeclarationStatement);
-            context.RegisterSyntaxNodeAction(GlobaVariableNameCheck, SyntaxKind.FieldDeclaration);
-            context.RegisterSyntaxNodeAction(EnumNameCheck, SyntaxKind.EnumDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeTypeAndFunctionName, SyntaxKind.MethodDeclaration, SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.PropertyDeclaration, SyntaxKind.DelegateDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzerLocalVariableName, SyntaxKind.LocalDeclarationStatement);
+            context.RegisterSyntaxNodeAction(AnalyzeGlobaVariableName, SyntaxKind.FieldDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeEnumName, SyntaxKind.EnumDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeInterfaceName, SyntaxKind.InterfaceDeclaration);
         }
 
-        private void EnumNameCheck(SyntaxNodeAnalysisContext context)
+        private void AnalyzeInterfaceName(SyntaxNodeAnalysisContext context)
+        {
+            var identifier = (context.Node as InterfaceDeclarationSyntax).Identifier.ToString();
+            if (String.IsNullOrWhiteSpace(identifier))
+            {
+                return;
+            }
+            if (identifier[0] != 'I')
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.InterfaceDeclaration} should start with I"));
+                return;
+            }
+            if (identifier.Length > 1 && !Char.IsUpper(identifier[1]))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.InterfaceDeclaration} should be in PascalCase"));
+                return;
+            }
+        }
+
+        private void AnalyzeEnumName(SyntaxNodeAnalysisContext context)
         {
             var identifier = (context.Node as EnumDeclarationSyntax).Identifier.ToString();
-            if (String.IsNullOrEmpty(identifier))
+            if (String.IsNullOrWhiteSpace(identifier))
             {
                 return;
             }
             if (!Char.IsUpper(identifier[0]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "Enums", "be in PascalCase"));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.EnumDeclaration} should be in PascalCase"));
+                return;
             }
             if (identifier.IndexOf("Enum", StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "Enums", @"not containt suffix ""Enum"""));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $@"{SyntaxKind.EnumDeclaration} should not contain suffix ""Enum"""));
+                return;
+            }
+            if (identifier.IndexOf("_") >= 0)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.EnumDeclaration} should not contain underscore"));
             }
         }
 
-        private void TypeAndFunctionNameCheck(SyntaxNodeAnalysisContext context)
+        private void AnalyzeTypeAndFunctionName(SyntaxNodeAnalysisContext context)
         {
             var identifier = String.Empty;
             var kind = SyntaxKind.None;
@@ -79,47 +102,61 @@ namespace Stylus.Analyzers
                 identifier = (context.Node as DelegateDeclarationSyntax).Identifier.ToString();
                 kind = SyntaxKind.DelegateDeclaration;
             }
-
-            if (String.IsNullOrEmpty(identifier))
+            if (String.IsNullOrWhiteSpace(identifier))
             {
                 return;
             }
             if (!Char.IsUpper(identifier[0]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), kind.ToString(), "be in PascalCase"));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{kind} should be in PascalCase"));
+                return;
+            }
+            if (identifier.IndexOf("_") >= 0)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{kind} should not contain underscore"));
             }
         }
 
-        private void LocalVariableNameCheck(SyntaxNodeAnalysisContext context)
+        private void AnalyzerLocalVariableName(SyntaxNodeAnalysisContext context)
         {
             var variable = context.Node as LocalDeclarationStatementSyntax;
             var identifier = variable.Declaration.Variables[0].Identifier.ToString();
-            if (String.IsNullOrEmpty(identifier))
+            if (String.IsNullOrWhiteSpace(identifier))
             {
                 return;
             }
             if (!Char.IsLower(identifier[0]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "Local variables", "be in camelCase"));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should be in camelCase"));
+                return;
+            }
+            if (identifier.IndexOf("_") >= 0)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should not contain underscore"));
             }
         }
 
-        private void GlobaVariableNameCheck(SyntaxNodeAnalysisContext context)
+        private void AnalyzeGlobaVariableName(SyntaxNodeAnalysisContext context)
         {
             var field = context.Node as FieldDeclarationSyntax;
             var identifier = field.Declaration.Variables[0].Identifier.ToString();
-            if (String.IsNullOrEmpty(identifier))
+            if (String.IsNullOrWhiteSpace(identifier))
             {
                 return;
             }
             if (!identifier.StartsWith("_"))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "Fields", "start with underscore"));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should start with underscore"));
                 return;
             }
-            if (!Char.IsLower(identifier[1]))
+            if (identifier.Length > 1 && !Char.IsLower(identifier[1]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "Fields", "be in camelCase"));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should be in camelCase"));
+                return;
+            }
+            if (identifier.LastIndexOf("_") > 0)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should not contain underscore"));
             }
         }
     }

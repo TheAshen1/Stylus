@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,8 +9,8 @@ namespace Stylus.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ModifierAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "ModifierAnalyzer";
-        internal static readonly LocalizableString Title = "ModifierAnalyzer Title";
+        public const string DiagnosticId = StylusManifest.ModifierAnalyzerId;
+        internal static readonly LocalizableString Title = "Access modifier rule violation";
         internal static readonly LocalizableString MessageFormat = "Access modifiers should always be specified";
         internal const string Category = StylusManifest.Category;
 
@@ -24,7 +20,7 @@ namespace Stylus.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(CheckModifier,
+            context.RegisterSyntaxNodeAction(AnalyzerModifier,
                 SyntaxKind.ClassDeclaration,
                 SyntaxKind.ConstructorDeclaration,
                 SyntaxKind.DelegateDeclaration,
@@ -39,7 +35,7 @@ namespace Stylus.Analyzers
                 SyntaxKind.StructDeclaration);
         }
 
-        private void CheckModifier(SyntaxNodeAnalysisContext context)
+        private void AnalyzerModifier(SyntaxNodeAnalysisContext context)
         {
             if (context.Node.IsKind(SyntaxKind.LocalDeclarationStatement))
             {

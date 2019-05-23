@@ -9,7 +9,7 @@ namespace Stylus.Analyzers
     public class ForbiddenStatementAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = StylusManifest.ForbiddenStatementAnalyzerId;
-        internal static readonly LocalizableString Title = "This statement should be avoided";
+        internal static readonly LocalizableString Title = "Forbidden statement rule violation";
         internal static readonly LocalizableString MessageFormat = "{0} statement should be avoided";
         internal const string Category = StylusManifest.Category;
 
@@ -21,10 +21,10 @@ namespace Stylus.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzerAction, SyntaxKind.ElseClause, SyntaxKind.DoStatement);
+            context.RegisterSyntaxNodeAction(AnalyzeForbiddenStatements, SyntaxKind.ElseClause, SyntaxKind.DoStatement);
         }
 
-        private void AnalyzerAction(SyntaxNodeAnalysisContext context)
+        private void AnalyzeForbiddenStatements(SyntaxNodeAnalysisContext context)
         {
             if (context.Node.IsKind(SyntaxKind.ElseClause))
             {

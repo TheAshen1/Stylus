@@ -7,7 +7,7 @@ using TestHelper;
 namespace Stylus.Analyzers.Tests
 {
     [TestClass]
-    public class ForbiddenStatementAnalyzerTests : DiagnosticVerifier
+    public class ModifierAnalyzerTests : DiagnosticVerifier
     {
         [TestMethod]
         public void TestMethod1()
@@ -27,28 +27,16 @@ namespace AnalyzerTest
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            var a = true;
-            if(a)
-            {
-                Console.WriteLine(""Ok"");
-            }
-            else
-            {
-                Console.WriteLine(""Not Ok"");
-            }
-        }
     }
 }";
             var expected = new DiagnosticResult
             {
-                Id = StylusManifest.ForbiddenStatementAnalyzerId,
-                Message = String.Format("{0} statement should be avoided", "Else"),
+                Id = StylusManifest.ModifierAnalyzerId,
+                Message = String.Format("Access modifiers should always be specified"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
-                            new DiagnosticResultLocation("Test0.cs", 15, 13)
+                            new DiagnosticResultLocation("Test0.cs", 6, 5)
                         }
             };
 
@@ -63,32 +51,25 @@ using System;
 
 namespace AnalyzerTest
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
-        {
-            do
-            {
-                Console.WriteLine(""do"");
-            }
-            while (true);
-        }
+        string _str;
     }
 }";
             var expected = new DiagnosticResult
             {
-                Id = StylusManifest.ForbiddenStatementAnalyzerId,
-                Message = String.Format("{0} statement should be avoided", "Do-While"),
+                Id = StylusManifest.ModifierAnalyzerId,
+                Message = String.Format("Access modifiers should always be specified"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
-                            new DiagnosticResultLocation("Test0.cs", 10, 13)
+                            new DiagnosticResultLocation("Test0.cs", 8, 9)
                         }
             };
 
             VerifyCSharpDiagnostic(test, expected);
         }
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new ForbiddenStatementAnalyzer();
+        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new ModifierAnalyzer();
     }
 }
