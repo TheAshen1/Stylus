@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -32,7 +33,7 @@ namespace Stylus.Analyzers
 
         private void AnalyzeInterfaceName(SyntaxNodeAnalysisContext context)
         {
-            var identifier = (context.Node as InterfaceDeclarationSyntax).Identifier.ToString();
+            string identifier = (context.Node as InterfaceDeclarationSyntax).Identifier.ToString();
             if (String.IsNullOrWhiteSpace(identifier))
             {
                 return;
@@ -51,7 +52,7 @@ namespace Stylus.Analyzers
 
         private void AnalyzeEnumName(SyntaxNodeAnalysisContext context)
         {
-            var identifier = (context.Node as EnumDeclarationSyntax).Identifier.ToString();
+            string identifier = (context.Node as EnumDeclarationSyntax).Identifier.ToString();
             if (String.IsNullOrWhiteSpace(identifier))
             {
                 return;
@@ -74,7 +75,7 @@ namespace Stylus.Analyzers
 
         private void AnalyzeTypeAndFunctionName(SyntaxNodeAnalysisContext context)
         {
-            var identifier = String.Empty;
+            string identifier = String.Empty;
             var kind = SyntaxKind.None;
 
             if (context.Node.IsKind(SyntaxKind.MethodDeclaration))
@@ -120,9 +121,22 @@ namespace Stylus.Analyzers
         private void AnalyzerLocalVariableName(SyntaxNodeAnalysisContext context)
         {
             var variable = context.Node as LocalDeclarationStatementSyntax;
-            var identifier = variable.Declaration.Variables[0].Identifier.ToString();
+            string identifier = variable.Declaration.Variables[0].Identifier.ToString();
             if (String.IsNullOrWhiteSpace(identifier))
             {
+                return;
+            }
+            if (identifier[0] == '@')
+            {
+                if (identifier.Length < 2)
+                {
+                    return;
+                }
+                identifier = identifier.Remove(0, 1);
+            }
+            if (!identifier.All(Char.IsLetterOrDigit))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should contain only letters or digits"));
                 return;
             }
             if (!Char.IsLower(identifier[0]))
@@ -130,16 +144,12 @@ namespace Stylus.Analyzers
                 context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should be in camelCase"));
                 return;
             }
-            if (identifier.IndexOf("_") >= 0)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should not contain underscore"));
-            }
         }
 
         private void AnalyzeGlobaVariableName(SyntaxNodeAnalysisContext context)
         {
             var field = context.Node as FieldDeclarationSyntax;
-            var identifier = field.Declaration.Variables[0].Identifier.ToString();
+            string identifier = field.Declaration.Variables[0].Identifier.ToString();
             if (String.IsNullOrWhiteSpace(identifier))
             {
                 return;

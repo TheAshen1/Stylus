@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Authors>Max Novikov</Authors>
+    <Authors>Maksym Novikov</Authors>
   </PropertyGroup>
 
   <ItemGroup>

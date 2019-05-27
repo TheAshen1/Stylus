@@ -9,7 +9,7 @@
   <PropertyGroup>
     <PackageId>Stylus.Analyzers</PackageId>
     <PackageVersion>1.0.0.0</PackageVersion>
-    <Authors>Max Novikov</Authors>
+    <Authors>Maksym Novikov</Authors>
     <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
     <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
     <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
@@ -21,6 +21,7 @@
     <PackageTags>Stylus, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <LangVersion>7.3</LangVersion>
+    <Company>Maksym Novikov</Company>
   </PropertyGroup>
 
   <ItemGroup>

@@ -27,9 +27,10 @@ namespace Stylus.Analyzers
         }
         private void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
         {
-            var variableDeclaration = (context.Node as LocalDeclarationStatementSyntax).Declaration;
-            var semanticModel = context.SemanticModel;
-            var isTypeApparent = IsTypeApparentInDeclaration(variableDeclaration, semanticModel);
+            VariableDeclarationSyntax variableDeclaration = (context.Node as LocalDeclarationStatementSyntax).Declaration;
+            SemanticModel semanticModel = context.SemanticModel;
+            ExpressionSyntax initializer = variableDeclaration.Variables.Single().Initializer?.Value;
+            bool isTypeApparent = IsTypeApparentInDeclaration(variableDeclaration, initializer, semanticModel);
             if (isTypeApparent && !variableDeclaration.Type.IsVar)
             {
                 context.ReportDiagnostic(
@@ -51,20 +52,20 @@ namespace Stylus.Analyzers
             ////      a. conversion with helpers like: int.Parse, TextSpan.From methods 
             ////      b. types that implement IConvertible and then invoking .ToType()
             ////      c. System.Convert.Totype()
-            //var declaredTypeSymbol = semanticModel.GetTypeInfo(variableDeclaration.Type, cancellationToken).Type;
-            //var expressionOnRightSide = initializerExpression.WalkDownParentheses();
+            ITypeSymbol declaredTypeSymbol = semanticModel.GetTypeInfo(variableDeclaration.Type, context.CancellationToken).Type;
+            var expressionOnRightSide = initializer.WalkDownParentheses();
 
-            //var memberName = expressionOnRightSide.GetRightmostName();
-            //if (memberName == null)
-            //{
-            //    return false;
-            //}
+            var memberName = expressionOnRightSide.GetRightmostName();
+            if (memberName == null)
+            {
+                return false;
+            }
 
-            //var methodSymbol = semanticModel.GetSymbolInfo(memberName, cancellationToken).Symbol as IMethodSymbol;
-            //if (methodSymbol == null)
-            //{
-            //    return false;
-            //}
+            var methodSymbol = semanticModel.GetSymbolInfo(memberName, cancellationToken).Symbol as IMethodSymbol;
+            if (methodSymbol == null)
+            {
+                return false;
+            }
 
             //if (memberName.IsRightSideOfDot())
             //{
@@ -75,9 +76,8 @@ namespace Stylus.Analyzers
             //return false;
         }
 
-        private bool IsTypeApparentInDeclaration(VariableDeclarationSyntax variableDeclaration, SemanticModel semanticModel)
+        private bool IsTypeApparentInDeclaration(VariableDeclarationSyntax variableDeclaration, ExpressionSyntax initializer, SemanticModel semanticModel)
         {
-            var initializer = variableDeclaration.Variables.Single().Initializer?.Value;
             if(initializer is null)
             {
                 return false;

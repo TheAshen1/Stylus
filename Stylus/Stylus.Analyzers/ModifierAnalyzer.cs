@@ -9,14 +9,14 @@ namespace Stylus.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ModifierAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = StylusManifest.ModifierAnalyzerId;
-        internal static readonly LocalizableString Title = "Access modifier rule violation";
-        internal static readonly LocalizableString MessageFormat = "Access modifiers should always be specified";
-        internal const string Category = StylusManifest.Category;
+        public const string _diagnosticId = StylusManifest.ModifierAnalyzerId;
+        internal static readonly LocalizableString _title = "Access modifier rule violation";
+        internal static readonly LocalizableString _messageFormat = "Access modifiers should always be specified";
+        internal const string _category = StylusManifest.Category;
 
-        internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
+        internal static DiagnosticDescriptor _rule = new DiagnosticDescriptor(_diagnosticId, _title, _messageFormat, _category, DiagnosticSeverity.Warning, true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(_rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
@@ -31,7 +31,6 @@ namespace Stylus.Analyzers
                 SyntaxKind.EventFieldDeclaration,
                 SyntaxKind.FieldDeclaration,
                 SyntaxKind.IndexerDeclaration,
-                SyntaxKind.InterfaceDeclaration,
                 SyntaxKind.MethodDeclaration,
                 SyntaxKind.PropertyDeclaration,
                 SyntaxKind.StructDeclaration);
@@ -54,7 +53,7 @@ namespace Stylus.Analyzers
 
             if (modifiers.HasValue && modifiers.Value.Count == 0)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation()));
             }
         }
     }
