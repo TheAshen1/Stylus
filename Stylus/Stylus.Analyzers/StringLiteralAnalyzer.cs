@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Linq.Expressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,19 +22,24 @@ namespace Stylus.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(AnalyzeStringLiteral, SyntaxKind.ReturnStatement, SyntaxKind.EqualsValueClause);
-            //context.RegisterSyntaxNodeAction(AnalyzeStringComparison, SyntaxKind.EqualsEqualsToken, SyntaxKind.ExclamationEqualsToken);
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.RegisterSyntaxNodeAction(AnalyzeReturnLiteral, SyntaxKind.ReturnStatement, SyntaxKind.EqualsValueClause);
+            context.RegisterOperationAction(AnalyzerBinaryOperation, OperationKind.Binary);
         }
 
-        //private void AnalyzeStringComparison(SyntaxNodeAnalysisContext context)
-        //{
-        //    if (context.Node.IsKind(SyntaxKind.EqualsEqualsToken))
-        //    {
-        //        context.Node.
-        //    }
-        //}
+        private void AnalyzerBinaryOperation(OperationAnalysisContext context)
+        {
+            var expression = context.Operation.Syntax as BinaryExpressionSyntax;
+            if ((expression.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) || expression.OperatorToken.IsKind(SyntaxKind.ExclamationEqualsToken))
+                && expression.Right.IsKind(SyntaxKind.StringLiteralExpression)
+                && String.IsNullOrEmpty((expression.Right as LiteralExpressionSyntax).Token.ValueText))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, expression.GetLocation(), "String.IsNullOrEmpty should be used instead"));
+            }
+        }
 
-        private void AnalyzeStringLiteral(SyntaxNodeAnalysisContext context)
+        private void AnalyzeReturnLiteral(SyntaxNodeAnalysisContext context)
         {
             if (context.Node.IsKind(SyntaxKind.ReturnStatement))
             {

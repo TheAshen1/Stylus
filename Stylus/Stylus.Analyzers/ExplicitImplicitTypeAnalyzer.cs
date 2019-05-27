@@ -23,11 +23,11 @@ namespace Stylus.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.VariableDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.LocalDeclarationStatement);
         }
         private void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
         {
-            var variableDeclaration = context.Node as VariableDeclarationSyntax;
+            var variableDeclaration = (context.Node as LocalDeclarationStatementSyntax).Declaration;
             var semanticModel = context.SemanticModel;
             var isTypeApparent = IsTypeApparentInDeclaration(variableDeclaration, semanticModel);
             if (isTypeApparent && !variableDeclaration.Type.IsVar)
