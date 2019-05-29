@@ -25,6 +25,7 @@ namespace Stylus.Analyzers
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(AnalyzerModifier,
                 SyntaxKind.ClassDeclaration,
+                SyntaxKind.InterfaceDeclaration,
                 SyntaxKind.ConstructorDeclaration,
                 SyntaxKind.DelegateDeclaration,
                 SyntaxKind.EnumDeclaration,
@@ -39,13 +40,14 @@ namespace Stylus.Analyzers
 
         private void AnalyzerModifier(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node.IsKind(SyntaxKind.LocalDeclarationStatement))
+            if (context.Node.IsKind(SyntaxKind.LocalDeclarationStatement) 
+                || context.Node.Parent.IsKind(SyntaxKind.InterfaceDeclaration))
             {
                 return;
             }
 
             SyntaxTokenList? modifiers = null;
-
+            
             modifiers = (context.Node as BaseTypeDeclarationSyntax)?.Modifiers ??
                         (context.Node as DelegateDeclarationSyntax)?.Modifiers ??
                         (context.Node as BaseFieldDeclarationSyntax)?.Modifiers ??

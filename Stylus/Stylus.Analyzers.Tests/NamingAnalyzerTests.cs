@@ -257,7 +257,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.NamingAnalyzerId,
-                Message = String.Format("Naming rule violation: {0}", $"{SyntaxKind.LocalDeclarationStatement} should not contain underscore"),
+                Message = String.Format("Naming rule violation: {0}", $"{SyntaxKind.LocalDeclarationStatement} should contain only letters or digits"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
