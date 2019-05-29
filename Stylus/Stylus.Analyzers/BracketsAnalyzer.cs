@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -9,14 +10,14 @@ namespace Stylus.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class BracketsAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = StylusManifest.BracketsAnalyzerId;
-        internal static readonly LocalizableString Title = "Brackets rule violation";
-        internal static readonly LocalizableString MessageFormat = "{0} should {1}";
-        internal const string Category = StylusManifest.Category;
+        public const string _diagnosticId = StylusManifest.BracketsAnalyzerId;
+        internal static readonly LocalizableString _title = "Brackets analyzer";
+        internal static readonly LocalizableString _messageFormat = "Code style violation: {0}";
+        internal const string _category = StylusManifest.Category;
 
-        internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
+        internal static DiagnosticDescriptor _rule = new DiagnosticDescriptor(_diagnosticId, _title, _messageFormat, _category, DiagnosticSeverity.Warning, true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(_rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
@@ -27,17 +28,17 @@ namespace Stylus.Analyzers
 
         private void AnalyzeParentheses(SyntaxNodeAnalysisContext context)
         {
-            var children = context.Node.ChildNodes();
-            var block = children.Where(n => n.IsKind(SyntaxKind.Block)).FirstOrDefault();
+            IEnumerable<SyntaxNode> children = context.Node.ChildNodes();
+            SyntaxNode block = children.Where(n => n.IsKind(SyntaxKind.Block)).FirstOrDefault();
             if (block is null)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "Braces", "be used"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), "Braces should be used"));
                 return;
             }
-            var whiteSpaceTrivia = block.GetLeadingTrivia().Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia));
+            IEnumerable<SyntaxTrivia> whiteSpaceTrivia = block.GetLeadingTrivia().Where(t => t.IsKind(SyntaxKind.WhitespaceTrivia));
             if(!whiteSpaceTrivia.Any())
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "Braces", "be placed on their own lines"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), "Braces should be placed on their own lines"));
             }
         }
     }

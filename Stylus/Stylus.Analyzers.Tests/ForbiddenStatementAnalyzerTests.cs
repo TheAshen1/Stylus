@@ -44,7 +44,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.ForbiddenStatementAnalyzerId,
-                Message = String.Format("{0} statement should be avoided", "Else"),
+                Message = String.Format("Code style violation: {0}", "Else statement should be avoided"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -78,7 +78,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.ForbiddenStatementAnalyzerId,
-                Message = String.Format("{0} statement should be avoided", "Do-While"),
+                Message = String.Format("Code style violation: {0}", "Do-While statement should be avoided"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {

@@ -32,7 +32,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.ModifierAnalyzerId,
-                Message = String.Format("Access modifiers should always be specified"),
+                Message = String.Format("Code style violation: {0}", "Access modifiers should always be specified"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -59,7 +59,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.ModifierAnalyzerId,
-                Message = String.Format("Access modifiers should always be specified"),
+                Message = String.Format("Code style violation: {0}", "Access modifiers should always be specified"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -88,7 +88,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.ModifierAnalyzerId,
-                Message = String.Format("Access modifiers should always be specified"),
+                Message = String.Format("Code style violation: {0}", "Access modifiers should always be specified"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -114,7 +114,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.ModifierAnalyzerId,
-                Message = String.Format("Access modifiers should always be specified"),
+                Message = String.Format("Code style violation: {0}", "Access modifiers should always be specified"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {

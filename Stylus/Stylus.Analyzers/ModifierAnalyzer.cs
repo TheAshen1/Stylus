@@ -12,7 +12,7 @@ namespace Stylus.Analyzers
     {
         public const string _diagnosticId = StylusManifest.ModifierAnalyzerId;
         internal static readonly LocalizableString _title = "Access modifier rule violation";
-        internal static readonly LocalizableString _messageFormat = "Access modifiers should always be specified";
+        internal static readonly LocalizableString _messageFormat = "Code style violation: {0}";
         internal const string _category = StylusManifest.Category;
 
         internal static DiagnosticDescriptor _rule = new DiagnosticDescriptor(_diagnosticId, _title, _messageFormat, _category, DiagnosticSeverity.Warning, true);
@@ -60,7 +60,7 @@ namespace Stylus.Analyzers
 
             if (!modifiers.Value.Where(m => IsAccessModifier(m)).Any())
             {
-                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), "Access modifiers should always be specified"));
             }
         }
 

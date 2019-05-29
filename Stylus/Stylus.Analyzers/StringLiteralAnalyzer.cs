@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Immutable;
-using System.Linq.Expressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,14 +10,14 @@ namespace Stylus.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class StringLiteralAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = StylusManifest.StringLiteralAnalyzerId;
-        internal static readonly LocalizableString Title = "String literal analyzer";
-        internal static readonly LocalizableString MessageFormat = "Code style violation: {0}";
-        internal const string Category = StylusManifest.Category;
+        public const string _diagnosticId = StylusManifest.StringLiteralAnalyzerId;
+        internal static readonly LocalizableString _title = "String literal analyzer";
+        internal static readonly LocalizableString _messageFormat = "Code style violation: {0}";
+        internal const string _category = StylusManifest.Category;
 
-        internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
+        internal static DiagnosticDescriptor _rule = new DiagnosticDescriptor(_diagnosticId, _title, _messageFormat, _category, DiagnosticSeverity.Warning, true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(_rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
@@ -35,7 +34,7 @@ namespace Stylus.Analyzers
                 && expression.Right.IsKind(SyntaxKind.StringLiteralExpression)
                 && String.IsNullOrEmpty((expression.Right as LiteralExpressionSyntax).Token.ValueText))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, expression.GetLocation(), "String.IsNullOrEmpty should be used instead"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, expression.GetLocation(), "String.IsNullOrEmpty should be used instead"));
             }
         }
 
@@ -43,18 +42,18 @@ namespace Stylus.Analyzers
         {
             if (context.Node.IsKind(SyntaxKind.ReturnStatement))
             {
-                var returnExpression = (context.Node as ReturnStatementSyntax).Expression;
+                ExpressionSyntax returnExpression = (context.Node as ReturnStatementSyntax).Expression;
                 if (returnExpression.IsKind(SyntaxKind.StringLiteralExpression) && String.IsNullOrEmpty((returnExpression as LiteralExpressionSyntax).Token.ValueText))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "String.Empty should be used instead"));
+                    context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), "String.Empty should be used instead"));
                 }
             }
             if (context.Node.IsKind(SyntaxKind.EqualsValueClause))
             {
-                var value = (context.Node as EqualsValueClauseSyntax).Value;
+                ExpressionSyntax value = (context.Node as EqualsValueClauseSyntax).Value;
                 if (value.IsKind(SyntaxKind.StringLiteralExpression) && String.IsNullOrEmpty((value as LiteralExpressionSyntax).Token.ValueText))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), "String.Empty should be used instead"));
+                    context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), "String.Empty should be used instead"));
 
                 }
             }

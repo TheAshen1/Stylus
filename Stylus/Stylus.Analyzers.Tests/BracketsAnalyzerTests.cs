@@ -52,7 +52,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.BracketsAnalyzerId,
-                Message = String.Format("{0} should {1}", "Braces", "be used"),
+                Message = String.Format("Code style violation: {0}", "Braces should be used"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
@@ -82,7 +82,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.BracketsAnalyzerId,
-                Message = String.Format("{0} should {1}", "Braces", "be placed on their own lines"),
+                Message = String.Format("Code style violation: {0}", "Braces should be placed on their own lines"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {

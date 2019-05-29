@@ -11,14 +11,14 @@ namespace Stylus.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class NamingAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = StylusManifest.NamingAnalyzerId;
-        internal static readonly LocalizableString Title = "Naming rule violation";
-        internal static readonly LocalizableString MessageFormat = "Naming rule violation: {0}";
-        internal const string Category = StylusManifest.Category;
+        public const string _diagnosticId = StylusManifest.NamingAnalyzerId;
+        internal static readonly LocalizableString _title = "Naming rule violation";
+        internal static readonly LocalizableString _messageFormat = "Naming rule violation: {0}";
+        internal const string _category = StylusManifest.Category;
 
-        internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
+        internal static DiagnosticDescriptor _rule = new DiagnosticDescriptor(_diagnosticId, _title, _messageFormat, _category, DiagnosticSeverity.Warning, true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(_rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
@@ -40,12 +40,12 @@ namespace Stylus.Analyzers
             }
             if (identifier[0] != 'I')
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.InterfaceDeclaration} should start with I"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.InterfaceDeclaration} should start with I"));
                 return;
             }
             if (identifier.Length > 1 && !Char.IsUpper(identifier[1]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.InterfaceDeclaration} should be in PascalCase"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.InterfaceDeclaration} should be in PascalCase"));
                 return;
             }
         }
@@ -59,24 +59,24 @@ namespace Stylus.Analyzers
             }
             if (!Char.IsUpper(identifier[0]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.EnumDeclaration} should be in PascalCase"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.EnumDeclaration} should be in PascalCase"));
                 return;
             }
             if (identifier.IndexOf("Enum", StringComparison.CurrentCultureIgnoreCase) >= 0)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $@"{SyntaxKind.EnumDeclaration} should not contain suffix ""Enum"""));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $@"{SyntaxKind.EnumDeclaration} should not contain suffix ""Enum"""));
                 return;
             }
             if (identifier.IndexOf("_") >= 0)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.EnumDeclaration} should not contain underscore"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.EnumDeclaration} should not contain underscore"));
             }
         }
 
         private void AnalyzeTypeAndFunctionName(SyntaxNodeAnalysisContext context)
         {
             string identifier = String.Empty;
-            var kind = SyntaxKind.None;
+            SyntaxKind kind = SyntaxKind.None;
 
             if (context.Node.IsKind(SyntaxKind.MethodDeclaration))
             {
@@ -109,12 +109,12 @@ namespace Stylus.Analyzers
             }
             if (!Char.IsUpper(identifier[0]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{kind} should be in PascalCase"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{kind} should be in PascalCase"));
                 return;
             }
             if (identifier.IndexOf("_") >= 0)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{kind} should not contain underscore"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{kind} should not contain underscore"));
             }
         }
 
@@ -136,12 +136,12 @@ namespace Stylus.Analyzers
             }
             if (!identifier.All(Char.IsLetterOrDigit))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should contain only letters or digits"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should contain only letters or digits"));
                 return;
             }
             if (!Char.IsLower(identifier[0]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should be in camelCase"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.LocalDeclarationStatement} should be in camelCase"));
                 return;
             }
         }
@@ -156,17 +156,17 @@ namespace Stylus.Analyzers
             }
             if (!identifier.StartsWith("_"))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should start with underscore"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should start with underscore"));
                 return;
             }
             if (identifier.Length > 1 && !Char.IsLower(identifier[1]))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should be in camelCase"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should be in camelCase"));
                 return;
             }
             if (identifier.LastIndexOf("_") > 0)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should not contain underscore"));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), $"{SyntaxKind.FieldDeclaration} should not contain underscore"));
             }
         }
     }

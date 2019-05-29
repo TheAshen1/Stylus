@@ -42,7 +42,7 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.EnumMemberAnalyzerId,
-                Message = String.Format("Enum members should have explicit value"),
+                Message = String.Format("Code style violation: {0}", "Enum members should have explicit value"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {

@@ -13,14 +13,14 @@ namespace Stylus.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class EnumMemberAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = StylusManifest.EnumMemberAnalyzerId;
-        internal static readonly LocalizableString Title = "Enum value analyzer";
-        internal static readonly LocalizableString MessageFormat = "Enum members should have explicit value";
-        internal const string Category = StylusManifest.Category;
+        public const string _diagnosticId = StylusManifest.EnumMemberAnalyzerId;
+        internal static readonly LocalizableString _title = "Enum member analyzer";
+        internal static readonly LocalizableString _messageFormat = "Code style violation: {0}";
+        internal const string _category = StylusManifest.Category;
 
-        internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
+        internal static DiagnosticDescriptor _rule = new DiagnosticDescriptor(_diagnosticId, _title, _messageFormat, _category, DiagnosticSeverity.Warning, true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(_rule); } }
 
         public override void Initialize(AnalysisContext context)
         {
@@ -34,7 +34,7 @@ namespace Stylus.Analyzers
             var member = context.Node as EnumMemberDeclarationSyntax;
             if (member.EqualsValue is null)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation(), "Enum members should have explicit value"));
             }
         }
     }

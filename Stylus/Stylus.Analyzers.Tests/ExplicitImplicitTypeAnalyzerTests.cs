@@ -39,11 +39,38 @@ namespace AnalyzerTest
             var expected = new DiagnosticResult
             {
                 Id = StylusManifest.ExplicitImplicitTypeAnalyzerId,
-                Message = String.Format("{0} type decalaration should be used", "Explicit"),
+                Message = String.Format("Code style violation: {0}", "Explicit type decalaration should be used"),
                 Severity = DiagnosticSeverity.Warning,
                 Locations =
                     new[] {
                             new DiagnosticResultLocation("Test0.cs", 9, 9)
+                        }
+            };
+
+            VerifyCSharpDiagnostic(test, expected);
+        }
+
+        [TestMethod]
+        public void TestMethod3()
+        {
+            var test = @"
+using System;
+
+namespace AnalyzerTest
+{
+    static void Main(string[] args)
+    {
+        string t = DateTime.Now.ToString();
+    }
+}";
+            var expected = new DiagnosticResult
+            {
+                Id = StylusManifest.ExplicitImplicitTypeAnalyzerId,
+                Message = String.Format("Code style violation: {0}", "Implicit type decalaration should be used"),
+                Severity = DiagnosticSeverity.Warning,
+                Locations =
+                    new[] {
+                            new DiagnosticResultLocation("Test0.cs", 8, 9)
                         }
             };
 
