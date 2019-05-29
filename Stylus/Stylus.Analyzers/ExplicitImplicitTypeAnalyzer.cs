@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -127,7 +128,7 @@ namespace Stylus.Analyzers
                 return true;
             }
 
-            var memberName = GetRightmostInvocationExpression(initializerExpression).GetRightmostName();
+            SimpleNameSyntax memberName = GetRightmostName(GetRightmostInvocationExpression(initializerExpression));
             if (memberName == null)
             {
                 return false;
@@ -139,14 +140,219 @@ namespace Stylus.Analyzers
                 return false;
             }
 
-            if (memberName.IsRightSideOfDot())
+            if (IsRightSideOfDot(memberName))
             {
-                var containingTypeName = memberName.GetLeftSideOfDot();
+                ExpressionSyntax containingTypeName = GetLeftSideOfDot(memberName);
                 return IsPossibleCreationOrConversionMethod(methodSymbol, typeInDeclaration, semanticModel, containingTypeName, cancellationToken);
             }
 
             return false;
         }
 
+        private static ExpressionSyntax GetRightmostInvocationExpression(ExpressionSyntax node)
+        {
+            if (node is AwaitExpressionSyntax awaitExpression && awaitExpression.Expression != null)
+            {
+                return GetRightmostInvocationExpression(awaitExpression.Expression);
+            }
+
+            if (node is InvocationExpressionSyntax invocationExpression && invocationExpression.Expression != null)
+            {
+                return GetRightmostInvocationExpression(invocationExpression.Expression);
+            }
+
+            if (node is ConditionalAccessExpressionSyntax conditional)
+            {
+                return GetRightmostInvocationExpression(conditional.WhenNotNull);
+            }
+
+            return node;
+        }
+
+        public static SimpleNameSyntax GetRightmostName(ExpressionSyntax node)
+        {
+            if (node is MemberAccessExpressionSyntax memberAccess && memberAccess.Name != null)
+            {
+                return memberAccess.Name;
+            }
+
+            if (node is QualifiedNameSyntax qualified && qualified.Right != null)
+            {
+                return qualified.Right;
+            }
+
+            if (node is SimpleNameSyntax simple)
+            {
+                return simple;
+            }
+
+            if (node is ConditionalAccessExpressionSyntax conditional)
+            {
+                return GetRightmostName(conditional.WhenNotNull);
+            }
+
+            if (node is MemberBindingExpressionSyntax memberBinding)
+            {
+                return memberBinding.Name;
+            }
+
+            if (node is AliasQualifiedNameSyntax aliasQualifiedName && aliasQualifiedName.Name != null)
+            {
+                return aliasQualifiedName.Name;
+            }
+
+            return null;
+        }
+
+        public static bool IsRightSideOfDot(ExpressionSyntax name)
+        {
+            return IsMemberAccessExpressionName(name) || IsRightSideOfQualifiedName(name) || IsQualifiedCrefName(name);
+        }
+
+        public static bool IsMemberAccessExpressionName(ExpressionSyntax expression)
+        {
+            return (IsParentKind(expression, SyntaxKind.SimpleMemberAccessExpression) && ((MemberAccessExpressionSyntax)expression.Parent).Name == expression) ||
+                   (IsMemberBindingExpressionName(expression));
+        }
+
+        public static bool IsParentKind(SyntaxNode node, SyntaxKind kind)
+        {
+            return node != null && node.Parent.IsKind(kind);
+        }
+
+        private static bool IsMemberBindingExpressionName(ExpressionSyntax expression)
+        {
+            return IsParentKind(expression, SyntaxKind.MemberBindingExpression) &&
+                ((MemberBindingExpressionSyntax)expression.Parent).Name == expression;
+        }
+
+        public static bool IsRightSideOfQualifiedName(ExpressionSyntax expression)
+        {
+            return IsParentKind(expression, SyntaxKind.QualifiedName) && ((QualifiedNameSyntax)expression.Parent).Right == expression;
+        }
+
+        public static bool IsQualifiedCrefName(ExpressionSyntax expression)
+        {
+            return IsParentKind(expression, SyntaxKind.NameMemberCref) && IsParentKind(expression.Parent, SyntaxKind.QualifiedCref);
+        }
+
+        public static ExpressionSyntax GetLeftSideOfDot(SimpleNameSyntax name)
+        {
+            //Debug.Assert(name.IsMemberAccessExpressionName() || name.IsRightSideOfQualifiedName() || name.IsParentKind(SyntaxKind.NameMemberCref));
+            if (IsMemberAccessExpressionName(name))
+            {
+                ConditionalAccessExpressionSyntax conditionalAccess = GetParentConditionalAccessExpression(name);
+                if (conditionalAccess is null)
+                {
+                    return ((MemberAccessExpressionSyntax)name.Parent).Expression;
+                }
+                return conditionalAccess.Expression;
+            }
+            if (IsRightSideOfQualifiedName(name))
+            {
+                return ((QualifiedNameSyntax)name.Parent).Left;
+            }
+            return ((QualifiedCrefSyntax)name.Parent.Parent).Container;
+        }
+
+        public static ConditionalAccessExpressionSyntax GetParentConditionalAccessExpression(SyntaxNode node)
+        {
+            SyntaxNode current = node;
+            while (current?.Parent != null)
+            {
+                if (IsParentKind(current, SyntaxKind.ConditionalAccessExpression) &&
+                    ((ConditionalAccessExpressionSyntax)current.Parent).WhenNotNull == current)
+                {
+                    return (ConditionalAccessExpressionSyntax)current.Parent;
+                }
+
+                current = current.Parent;
+            }
+
+            return null;
+        }
+
+        private static bool IsPossibleCreationOrConversionMethod(IMethodSymbol methodSymbol,
+            ITypeSymbol typeInDeclaration,
+            SemanticModel semanticModel,
+            ExpressionSyntax containingTypeName,
+            CancellationToken cancellationToken)
+        {
+            if (methodSymbol.ReturnsVoid)
+            {
+                return false;
+            }
+
+            ITypeSymbol containingType = semanticModel.GetTypeInfo(containingTypeName, cancellationToken).Type;
+
+            return IsPossibleCreationMethod(methodSymbol, typeInDeclaration, containingType)
+                || IsPossibleConversionMethod(methodSymbol, typeInDeclaration, containingType, semanticModel, cancellationToken);
+        }
+
+        private static bool IsPossibleCreationMethod(IMethodSymbol methodSymbol,
+           ITypeSymbol typeInDeclaration,
+           ITypeSymbol containingType)
+        {
+            if (!methodSymbol.IsStatic)
+            {
+                return false;
+            }
+
+            return IsContainerTypeEqualToReturnType(methodSymbol, typeInDeclaration, containingType);
+        }
+
+        private static bool IsContainerTypeEqualToReturnType(IMethodSymbol methodSymbol,
+           ITypeSymbol typeInDeclaration,
+           ITypeSymbol containingType)
+        {
+            ITypeSymbol returnType = UnwrapTupleType(methodSymbol.ReturnType);
+
+            if (GetTypeArguments(UnwrapTupleType(typeInDeclaration)).Length > 0 ||
+                GetTypeArguments(containingType).Length > 0)
+            {
+                return UnwrapTupleType(containingType).Name.Equals(returnType.Name);
+            }
+            return UnwrapTupleType(containingType).Equals(returnType);
+        }
+
+        public static ImmutableArray<ITypeSymbol> GetTypeArguments(ISymbol symbol)
+        {
+            switch (symbol)
+            {
+                case IMethodSymbol m: return m.TypeArguments;
+                case INamedTypeSymbol nt: return nt.TypeArguments;
+                default: return ImmutableArray.Create<ITypeSymbol>();
+            }
+        }
+
+        private static bool IsPossibleConversionMethod(IMethodSymbol methodSymbol,
+           ITypeSymbol typeInDeclaration,
+           ITypeSymbol containingType,
+           SemanticModel semanticModel,
+           CancellationToken cancellationToken)
+        {
+            ITypeSymbol returnType = methodSymbol.ReturnType;
+            string returnTypeName = IsNullable(returnType)
+                ? GetTypeArguments(returnType).First().Name
+                : returnType.Name;
+
+            return methodSymbol.Name.Equals("To" + returnTypeName, StringComparison.Ordinal);
+        }
+
+        private static ITypeSymbol UnwrapTupleType(ITypeSymbol symbol)
+        {
+            if (symbol is null)
+            {
+                return null;
+            }
+            if (!(symbol is INamedTypeSymbol namedTypeSymbol))
+            {
+                return symbol;
+            }
+            return namedTypeSymbol.TupleUnderlyingType ?? symbol;
+        }
+
+        public static bool IsNullable(ITypeSymbol symbol)
+            => symbol?.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -50,11 +51,24 @@ namespace Stylus.Analyzers
                         (context.Node as BaseFieldDeclarationSyntax)?.Modifiers ??
                         (context.Node as BasePropertyDeclarationSyntax)?.Modifiers ??
                         (context.Node as BaseMethodDeclarationSyntax)?.Modifiers;
+            if (!modifiers.HasValue)
+            {
+                return;
+            }
 
-            if (modifiers.HasValue && modifiers.Value.Count == 0)
+            if (!modifiers.Value.Where(m => IsAccessModifier(m)).Any())
             {
                 context.ReportDiagnostic(Diagnostic.Create(_rule, context.Node.GetLocation()));
             }
+        }
+
+        private bool IsAccessModifier(SyntaxToken modifier)
+        {
+            bool isAccessModifier = modifier.IsKind(SyntaxKind.PublicKeyword) 
+                                    || modifier.IsKind(SyntaxKind.PrivateKeyword)
+                                    || modifier.IsKind(SyntaxKind.ProtectedKeyword)
+                                    || modifier.IsKind(SyntaxKind.InternalKeyword);
+            return isAccessModifier;
         }
     }
 }
